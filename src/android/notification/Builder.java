@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.MessagingStyle.Message;
@@ -39,6 +40,9 @@ import de.appplant.cordova.plugin.notification.action.Action;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static de.appplant.cordova.plugin.notification.Notification.EXTRA_UPDATE;
+
+import android.app.NotificationManager;
+import android.app.NotificationChannel;
 
 /**
  * Builder class for local notifications. Build fully configured local
@@ -110,6 +114,21 @@ public final class Builder {
      * @return The final notification to display.
      */
     public Notification build() {
+
+      final int MINVERSION = 26;
+      if (Build.VERSION.SDK_INT >= MINVERSION) {
+        CharSequence name = "wittychannel"; //getString(R.string.channel_name);
+        String description = "wittychanneldescription"; // getString(R.string.channel_description);
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel channel = new NotificationChannel("WITTYCHANNELL123456", name, importance);
+        channel.setDescription(description);
+        // Register the channel with the system; you can't change the importance
+        // or other notification behaviors after this
+        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+      }
+
+
         NotificationCompat.Builder builder;
 
         if (options.isSilent()) {
@@ -165,6 +184,10 @@ public final class Builder {
         applyActions(builder);
         applyDeleteReceiver(builder);
         applyContentReceiver(builder);
+
+      if (Build.VERSION.SDK_INT >= MINVERSION) {
+        builder.setChannelId("WITTYCHANNELL123456");
+      }
 
         return new Notification(context, options, builder);
     }
